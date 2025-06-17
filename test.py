@@ -1,35 +1,34 @@
-import asyncio
-import os
-from pydantic import BaseModel
-
-from mistralai import Mistral
+from src.InferenceEngine import InferenceEngine, FSLData
 
 
-async def main():
-    api_key = os.environ["MISTRAL_API_KEY"]
-    client = Mistral(api_key=api_key)
+# inference engine setup
+ie = InferenceEngine(temp=0.1)
 
-    class Explanation(BaseModel):
-        explanation: str
-        output: str
 
-    class MathDemonstration(BaseModel):
-        steps: list[Explanation]
-        final_answer: str
+# Example Callback
+def testingres(res):
+    print(res.choices[0].message.content)
 
-    chat_response = await client.chat.parse_async(
-        model="mistral-large-2411",
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful math tutor. You will be provided with a math problem, and your goal will be to output a step by step solution, along with a final answer. For each step, just provide the output as an equation use the explanation field to detail the reasoning.",
-            },
-            {"role": "user", "content": "How can I solve 8x + 7 = -23"},
-        ],
-        response_format=MathDemonstration,
+
+# MultiShot/FewShot Learning setup
+examples = []
+
+examples.append(
+    FSLData(
+        "Say Hello World in a random language.",
+        "1) Language: translation",
     )
-    print(chat_response.choices[0].message.parsed)
+)
+examples.append(
+    FSLData(
+        "Say Hello World in 2 random languages.",
+        "1) English: smtg smtg\n2) French: smtg smtg",
+    )
+)
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+ie.GivePrompt(
+    testingres,
+    "Say Hello World in 12 random languages.",
+    learning=examples,
+)

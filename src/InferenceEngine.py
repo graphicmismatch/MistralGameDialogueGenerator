@@ -2,6 +2,14 @@ import os
 import asyncio
 from dotenv import load_dotenv, find_dotenv
 from mistralai import Mistral
+from dataclasses import dataclass
+from typing import *
+
+
+@dataclass
+class FSLData:
+    prompt: str
+    response: str
 
 
 class InferenceEngine:
@@ -21,18 +29,37 @@ class InferenceEngine:
         self.client = Mistral(api_key=apikey)
         self.temp = temp
 
-    def GiveStandardPrompt(
-        self, callback, userprompt: str, systemprompt: str = None, temp: float = None
+    def GivePrompt(
+        self,
+        callback,
+        userprompt: str,
+        systemprompt: str = None,
+        learning: List[FSLData] = None,
+        temp: float = None,
     ):
         messagedict = []
+        if learning is not None:
+            if systemprompt is None:
+                systemprompt = ""
+            systemprompt += "\n ALWAYS follow the format in the provided examples. The examples are only for formatting, the actual content of the examples is less important. DO NOT deviate from the format."
         if systemprompt is not None:
             messagedict.append({"role": "system", "content": f"{systemprompt}"})
+
+        if learning is not None:
+            n = 0
+            for i in learning:
+                n += 1
+                t = f"Example {n}: " + i.prompt
+                messagedict.append({"role": "user", "content": f"{t}"})
+                messagedict.append({"role": "assistant", "content": f"{i.response}"})
+
         messagedict.append({"role": "user", "content": f"{userprompt}"})
+
         if temp is None:
             temp = self.temp
-        asyncio.run(self.StandardPromptWorker(callback, messagedict, temp))
+        asyncio.run(self.PromptWorker(callback, messagedict, temp))
 
-    async def StandardPromptWorker(self, callback, messagedict, temp: float):
+    async def PromptWorker(self, callback, messagedict, temp: float):
         res = await self.client.chat.complete_async(
             model=self.model, messages=messagedict, temperature=temp
         )
