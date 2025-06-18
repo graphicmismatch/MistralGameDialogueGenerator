@@ -5,6 +5,25 @@ from mistralai import Mistral
 from dataclasses import dataclass
 from typing import *
 
+import asyncio
+
+
+import asyncio
+
+
+def run_async_task(coro):
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
+    except RuntimeError:
+        # Fallback for cases where loop is closed or doesn't exist
+        new_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(new_loop)
+        return new_loop.run_until_complete(coro)
+
 
 @dataclass
 class FSLData:
@@ -57,7 +76,7 @@ class InferenceEngine:
 
         if temp is None:
             temp = self.temp
-        asyncio.run(self.PromptWorker(callback, messagedict, temp))
+        run_async_task(self.PromptWorker(callback, messagedict, temp))
 
     async def PromptWorker(self, callback, messagedict, temp: float):
         res = await self.client.chat.complete_async(
