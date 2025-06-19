@@ -9,7 +9,7 @@ prompt = builder.build_prompt(
 
 
 def testingres(res):
-    # print("Jarvis says:\n")
+
     print(res.choices[0].message.content)
 
 

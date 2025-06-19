@@ -18,8 +18,26 @@ tab1, tab2, tab3 = st.tabs(
 )
 
 with tab1:
-    st.header("👾 Casual Game Developer")
-    st.info("This section is under development. Stay tuned!")
+    st.header("👻 Casual Game Developer")
+    st.subheader("Real-Time Dialogue Generator")
+
+    char_name = st.text_input("Character Name")
+    theme = st.text_input("Theme")
+    mood = st.text_input("Mood")
+    situation = st.text_area("What's happening in the game?")
+
+    if st.button("Generate Dialogue"):
+        simple_prompt = pb.BuildCasualPrompt(
+            character=char_name,
+            theme=theme,
+            mood=mood,
+            situation=situation
+        )
+        ie.GivePrompt(
+            callback=display_callback,
+            userprompt=simple_prompt,
+            systemprompt="Generate immersive and fun character dialogue for a casual game developer based on the input.",
+        )
 
 
 with tab2:
@@ -49,5 +67,24 @@ with tab2:
 
 
 with tab3:
-    st.header("📝 Game Reviewer")
-    st.info("This section is under development. Check back later!")
+    st.header("📝 Game Reviewer & Influencer")
+    st.subheader("Customized Content")
+
+    game = st.text_input("Game Name")
+    audience = st.text_input("Target Audience")
+    style = st.text_input("Preferred Style")
+    content_type = st.text_input("Type of Content")
+
+    if st.button("Generate Reviewer Content"):
+        prompt = pb.BuildReviewerPrompt(
+            game=game,
+            audience=audience,
+            style=style,
+            content_type=content_type
+        )
+        ie.GivePrompt(
+            callback=display_callback,
+            userprompt=prompt,
+            systemprompt="You are helping a game reviewer/influencer create content that is fresh, engaging, and tailored for their audience.",
+        )
+
