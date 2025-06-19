@@ -7,12 +7,59 @@ class PromptBuilder:
     def __init__(self, character_file: str):
         self.character_data = self.load_character(character_file)
 
+    @staticmethod
+    def BuildCasualPrompt(character: str, theme: str, mood: str, situation: str) -> str:
+        if character.strip() == "":
+            character = "<random>"
+        if theme.strip() == "":
+            theme = "<random>"
+        if mood.strip() == "":
+            mood = "<random>"
+        if situation.strip() == "":
+            situation = "<random>"
+
+        return f"""
+        Generate a dialogue based on the following casual game design input:
+
+        - Character: {character}
+        - Theme: {theme}
+        - Mood: {mood}
+        - Situation: {situation}
+
+        Respond as if it's a game scene script between characters. Keep the tone light and imaginative.
+        """
+
+
     def load_character(self, path: str) -> dict:
         character_path = Path(path)
         if not character_path.exists():
             raise FileNotFoundError(f"Character file {path} not found.")
         with open(character_path, "r", encoding="utf-8") as file:
             return json.load(file)
+        
+    @staticmethod
+    def BuildReviewerPrompt(game: str, audience: str, style: str, content_type: str) -> str:
+        if game.strip() == "":
+            game = "<random>"
+        if audience.strip() == "":
+            audience = "<random>"
+        if style.strip() == "":
+            style = "<random>"
+        if content_type.strip() == "":
+            content_type = "<random>"
+
+        return f"""
+        Generate creative content for a game reviewer or influencer with the following details:
+
+        - Game: {game}
+        - Target Audience: {audience}
+        - Style: {style}
+        - Content Type: {content_type}
+
+        Ensure the content is catchy, engaging, and suitable for social media or video commentary.
+        Keep it concise and audience-appropriate.
+        """
+
 
     def build_prompt(self, situation: str) -> str:
         name = self.character_data.get("name", "Unknown")
