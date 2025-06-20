@@ -8,9 +8,6 @@ from typing import *
 import asyncio
 
 
-import asyncio
-
-
 def run_async_task(coro):
     try:
         loop = asyncio.get_event_loop()

@@ -1,5 +1,5 @@
-from src.logic.InferenceEngine import InferenceEngine
-from src.logic.PromptBuilder import PromptBuilder as pb
+from utils.InferenceEngine import InferenceEngine
+from utils.PromptBuilder import PromptBuilder as pb
 
 ie = InferenceEngine(temp=0.2)
 builder = pb("characters/jarvis.json")

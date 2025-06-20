@@ -1,14 +1,20 @@
 import json
 from pathlib import Path
-from src.logic.InferenceEngine import *
+from utils.InferenceEngine import *
 
 
 class PromptBuilder:
     def __init__(self, character_file: str):
         self.character_data = self.load_character(character_file)
 
-    @staticmethod
-    def BuildCasualPrompt(character: str, theme: str, mood: str, situation: str) -> str:
+    def BuildCasualPrompt(
+        callback,
+        ie: InferenceEngine,
+        character: str,
+        theme: str,
+        mood: str,
+        situation: str,
+    ):
         if character.strip() == "":
             character = "<random>"
         if theme.strip() == "":
@@ -17,8 +23,8 @@ class PromptBuilder:
             mood = "<random>"
         if situation.strip() == "":
             situation = "<random>"
-
-        return f"""
+        systemprompt = "Generate immersive and fun character dialogue for a casual game developer based on the input."
+        prompt = f"""
         Generate a dialogue based on the following casual game design input:
 
         - Character: {character}
@@ -29,6 +35,11 @@ class PromptBuilder:
         Respond as if it's a game scene script between characters. Keep the tone light and imaginative.
         """
 
+        ie.GivePrompt(
+            callback=callback,
+            userprompt=prompt,
+            systemprompt=systemprompt,
+        )
 
     def load_character(self, path: str) -> dict:
         character_path = Path(path)
@@ -36,9 +47,15 @@ class PromptBuilder:
             raise FileNotFoundError(f"Character file {path} not found.")
         with open(character_path, "r", encoding="utf-8") as file:
             return json.load(file)
-        
-    @staticmethod
-    def BuildReviewerPrompt(game: str, audience: str, style: str, content_type: str) -> str:
+
+    def BuildReviewerPrompt(
+        callback,
+        ie: InferenceEngine,
+        game: str,
+        audience: str,
+        style: str,
+        content_type: str,
+    ):
         if game.strip() == "":
             game = "<random>"
         if audience.strip() == "":
@@ -47,8 +64,8 @@ class PromptBuilder:
             style = "<random>"
         if content_type.strip() == "":
             content_type = "<random>"
-
-        return f"""
+        systemprompt = "You are helping a game reviewer/influencer create content that is fresh, engaging, and tailored for their audience."
+        prompt = """
         Generate creative content for a game reviewer or influencer with the following details:
 
         - Game: {game}
@@ -60,6 +77,11 @@ class PromptBuilder:
         Keep it concise and audience-appropriate.
         """
 
+        ie.GivePrompt(
+            callback=callback,
+            userprompt=prompt,
+            systemprompt=systemprompt,
+        )
 
     def build_prompt(self, situation: str) -> str:
         name = self.character_data.get("name", "Unknown")
@@ -69,7 +91,7 @@ class PromptBuilder:
 
         return (
             f"You are {name}, a {personality} {role}. "
-            f"Your backstory: {backstory}.\n\n"
+            f"Your backstory: {backstory}.\n"
             f"Situation: {situation}\n"
             f"Respond in character."
         )
@@ -135,7 +157,7 @@ class PromptBuilder:
         6) Mood: funny
         """,
             """
-        Blorg> Hey!\nBlingus> Whats Up?\nBlorg> Nothing much, trying not to freeze here... Jupiter is much colder than Earth\nBlingus> Seriously, it is unbearable. I'm Blingus, what is your name?\nBlorg> I'm Blorg, nice to meet you!\nBlingus> Nice to meet you too!
+        Blorg> Hey!\n\n**Blingus>** Whats Up?\n\n**Blorg>** Nothing much, trying not to freeze here... Jupiter is much colder than Earth\n\n**Blingus>** Seriously, it is unbearable. I'm Blingus, what is your name?\n\n**Blorg>** I'm Blorg, nice to meet you!\n\n**Blingus>** Nice to meet you too!
         """,
         )
 
@@ -151,7 +173,7 @@ class PromptBuilder:
         6) Mood: serious
         """,
             """
-        Zeke> Jake! Did you find anything?\nJake> No, not a single trace of her.\nZeke> HOW HARD IS IT TO FIND ONE OLD ELF?\n- after 5 minutes -\nZeke> Hey! I found something. Come here!\nJake> Woah, its a burrow, do you think the elf would be in there?\nZeke> She could be! Lets check it out
+        Zeke> Jake! Did you find anything?\n\n**Jake>** No, not a single trace of her.\n\n**Zeke>** HOW HARD IS IT TO FIND ONE OLD ELF?\n\n- after 5 minutes -\n\n**Zeke>** Hey! I found something. Come here!\n\n**Jake>** Woah, its a burrow, do you think the elf would be in there?\n\n**Zeke>** She could be! Lets check it out
         """,
         )
 
@@ -167,7 +189,7 @@ class PromptBuilder:
         6) Mood: serious
         """,
             """
-        Characters:\n1) Zeke: Cool guy tbh\n2) Jake: thinks zeke has a cool name\n\n====================================\n\nZeke> Jake! Did you find anything?\nJake> No, not a single trace of her.\nZeke> HOW HARD IS IT TO FIND ONE OLD ELF?\n- after 5 minutes -\nZeke> Hey! I found something. Come here!\nJake> Woah, its a burrow, do you think the elf would be in there?\nZeke> She could be! Lets check it out
+        - **Characters:**\n\t1. **Zeke:** Cool guy tbh\n\t2. **Jake:** thinks zeke has a cool name\n\n___\n\n**Zeke>** Jake! Did you find anything?\n\n**Jake>** No, not a single trace of her.\n\n**Zeke>** HOW HARD IS IT TO FIND ONE OLD ELF?\n\n- after 5 minutes -\n\n**Zeke>** Hey! I found something. Come here!\n\n**Jake>** Woah, its a burrow, do you think the elf would be in there?\n\n**Zeke>** She could be! Lets check it out
         """,
         )
 
@@ -183,7 +205,7 @@ class PromptBuilder:
         6) Mood: serious
         """,
             """
-        Theme:\nArcane Fantasy: Arcane Fantasy blends magic with mysterious, fantastical worlds.\n\nCharacters:\n1) Zack: aloof\n2) Dyke: curious\n3) Bline: very observant\n\n====================================\n\nBline> Guys! Did you find anything?\nDyke> No, not a single trace of her.\nZack> HOW HARD IS IT TO FIND ONE OLD ELF?\n- after 25 minutes -\nBline> Hey Guys! I found something. Come here!\nZack> Woah, its a burrow, do you think the elf would be in there?\nDyke> She could be! Lets check it out
+        - **Theme:**\n\t- **Arcane Fantasy:** Arcane Fantasy blends magic with mysterious, fantastical worlds.\n\n___\n\n- **Characters:**\n\t1. **Zack:** aloof\n\t2. **Dyke:** curious\n\t3. **Bline:** very observant\n\n\n\n___\n\n\n\n**Bline>** Guys! Did you find anything?\n\n**Dyke>** No, not a single trace of her.\n\n**Zack>** HOW HARD IS IT TO FIND ONE OLD ELF?\n\n- after 25 minutes -\n\n**Bline>** Hey Guys! I found something. Come here!\n\n**Zack>** Woah, its a burrow, do you think the elf would be in there?\n\n**Dyke>** She could be! Lets check it out
         """,
         )
 
@@ -199,7 +221,7 @@ class PromptBuilder:
         6) Mood: serious
         """,
             """
-        Theme:\nSci-fi: Sci-fi explores futuristic concepts, advanced technology, and the impact of science on society.\nCharacters:\n1) Mac: kinda pretentious\n2) Loki: patient\n\n====================================\n\nLoki> Mac! Did you find anything?\nMac> No, not a single trace of her.\nMac> HOW HARD IS IT TO FIND ONE OLD ELF?\n- after 7 minutes -\nMac> Hey! I found something. Come here!\nLoki> Woah, its a laser pistol, do you think the elf dropped it?\nMac> She could be! Lets check it out
+        - **Theme:**\n\t- **Sci-fi:** Sci-fi explores futuristic concepts, advanced technology, and the impact of science on society.\n\n___\n\n- Characters:\n\t1. **Mac:** kinda pretentious\n\t2. **Loki:** patient\n\n\n\n___\n\n\n\n**Loki>** Mac! Did you find anything?\n\n**Mac>** No, not a single trace of her.\n\n**Mac>** HOW HARD IS IT TO FIND ONE OLD ELF?\n\n- after 7 minutes -\n\n**Mac>** Hey! I found something. Come here!\n\n**Loki>** Woah, its a laser pistol, do you think the elf dropped it?\n\n**Mac>** She could be! Lets check it out
         """,
         )
         examples = [example1, example2, example3, example4, example5]

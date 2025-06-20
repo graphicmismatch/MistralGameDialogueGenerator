@@ -1,16 +1,16 @@
 import streamlit as st
-from src.logic.InferenceEngine import InferenceEngine
-from src.logic.PromptBuilder import PromptBuilder as pb
+from utils.InferenceEngine import InferenceEngine
+from utils.PromptBuilder import PromptBuilder as pb
 
 
 def display_callback(result):
-    st.text(result.choices[0].message.content)
+    st.markdown(result.choices[0].message.content)
 
 
 ie = InferenceEngine()
 
-st.set_page_config(page_title="Game Dev Hub", layout="centered")
-st.title("🎮 Game Development Portal")
+st.set_page_config(page_title="Game Dialogue Hub", layout="centered")
+st.title("🎮 Game Dialogue Hub")
 
 
 tab1, tab2, tab3 = st.tabs(
@@ -27,18 +27,14 @@ with tab1:
     situation = st.text_area("What's happening in the game?")
 
     if st.button("Generate Dialogue"):
-        simple_prompt = pb.BuildCasualPrompt(
+        pb.BuildCasualPrompt(
+            callback=display_callback,
+            ie=ie,
             character=char_name,
             theme=theme,
             mood=mood,
-            situation=situation
+            situation=situation,
         )
-        ie.GivePrompt(
-            callback=display_callback,
-            userprompt=simple_prompt,
-            systemprompt="Generate immersive and fun character dialogue for a casual game developer based on the input.",
-        )
-
 
 with tab2:
     st.header("🧠 Professional Game Developer")
@@ -76,15 +72,11 @@ with tab3:
     content_type = st.text_input("Type of Content")
 
     if st.button("Generate Reviewer Content"):
-        prompt = pb.BuildReviewerPrompt(
+        pb.BuildReviewerPrompt(
+            callback=display_callback,
+            ie=ie,
             game=game,
             audience=audience,
             style=style,
-            content_type=content_type
+            content_type=content_type,
         )
-        ie.GivePrompt(
-            callback=display_callback,
-            userprompt=prompt,
-            systemprompt="You are helping a game reviewer/influencer create content that is fresh, engaging, and tailored for their audience.",
-        )
-
