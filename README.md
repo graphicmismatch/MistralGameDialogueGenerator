@@ -6,4 +6,4 @@ AI-Powered Game Dialogue Generator with Mistral
  - using Python 3.9.13
 
 
-## [Documentation](./docs/MistralAiGameDialogueGenerator.md)
+## [Documentation](./docs/MistralAIGameDialogueGenerator.md)
