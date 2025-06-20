@@ -7,3 +7,12 @@ AI-Powered Game Dialogue Generator with Mistral
 
 
 ## [Documentation](./docs/MistralAIGameDialogueGenerator.md)
+
+## Team
+
+This project was made by:
+
+- Rayan Vishal Madan
+- Ankan Das
+- Yash Agnihotri
+- Harsh Nayan
