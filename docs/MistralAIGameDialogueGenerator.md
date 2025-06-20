@@ -19,3 +19,13 @@ This project consists of 3 main files:
 - [PromptBuilder.py](./PromptBuilder.md)
 
 ![Project Architecture](./assets/flow.png)
+
+
+## Team
+
+This project was made by:
+
+- Rayan Vishal Madan
+- Ankan Das
+- Yash Agnihotri
+- Harsh Nayan
