@@ -21,20 +21,21 @@ with tab1:
     st.header("👻 Casual Game Developer")
     st.subheader("Real-Time Dialogue Generator")
 
-    char_name = st.text_input("Character Name")
-    theme = st.text_input("Theme")
-    mood = st.text_input("Mood")
-    situation = st.text_area("What's happening in the game?")
-
-    if st.button("Generate Dialogue"):
-        pb.BuildCasualPrompt(
-            callback=display_callback,
-            ie=ie,
-            character=char_name,
-            theme=theme,
-            mood=mood,
-            situation=situation,
-        )
+    with st.form("cas_dev_form"):
+        char_name = st.text_input("Character Name")
+        theme = st.text_input("Theme")
+        mood = st.text_input("Mood")
+        situation = st.text_area("What's happening in the game?")
+        submitted = st.form_submit_button("Submit")
+        if submitted:
+            pb.BuildCasualPrompt(
+                callback=display_callback,
+                ie=ie,
+                character=char_name,
+                theme=theme,
+                mood=mood,
+                situation=situation,
+            )
 
 with tab2:
     st.header("🧠 Professional Game Developer")
@@ -66,17 +67,18 @@ with tab3:
     st.header("📝 Game Reviewer & Influencer")
     st.subheader("Customized Content")
 
-    game = st.text_input("Game Name")
-    audience = st.text_input("Target Audience")
-    style = st.text_input("Preferred Style")
-    content_type = st.text_input("Type of Content")
-
-    if st.button("Generate Reviewer Content"):
-        pb.BuildReviewerPrompt(
-            callback=display_callback,
-            ie=ie,
-            game=game,
-            audience=audience,
-            style=style,
-            content_type=content_type,
-        )
+    with st.form("reviewer_form"):
+        game = st.text_input("Game Name")
+        audience = st.text_input("Target Audience")
+        style = st.text_input("Preferred Style")
+        content_type = st.text_input("Type of Content")
+        submitted = st.form_submit_button("Submit")
+        if submitted:
+            pb.BuildReviewerPrompt(
+                callback=display_callback,
+                ie=ie,
+                game=game,
+                audience=audience,
+                style=style,
+                content_type=content_type,
+            )

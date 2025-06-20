@@ -65,7 +65,7 @@ class PromptBuilder:
         if content_type.strip() == "":
             content_type = "<random>"
         systemprompt = "You are helping a game reviewer/influencer create content that is fresh, engaging, and tailored for their audience."
-        prompt = """
+        prompt = f"""
         Generate creative content for a game reviewer or influencer with the following details:
 
         - Game: {game}
